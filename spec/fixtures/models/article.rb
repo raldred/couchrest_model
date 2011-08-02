@@ -19,8 +19,16 @@ class Article < CouchRest::Model::Base
       "function(keys, values, rereduce) {
         return sum(values);
       }"
+      
+  view_by :user_id_and_time,
+    :map => "function(doc){
+              if(doc['#{model_type_key}'] == 'Article') {
+                emit([doc['user_id'], doc['time']], null);
+              }
+           }"
 
   property :date, Date
+  property :time, Time
   property :slug, :read_only => true
   property :user_id
   property :title

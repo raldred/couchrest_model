@@ -348,5 +348,20 @@ describe CouchRest::Model::Views do
       Article.design_doc["views"].keys.should include("by_updated_at")
     end
   end
+  
+  describe "accessing data by custom view" do
+    it "should return the row" do
+      art = Article.create! :title => 'a title', :user_id => 'bob', :time => Time.now - 1.minute
+      rows = Article.by_user_id_and_time :startkey => ['bob'], :endkey => ['bob',Time.now]
+      rows.length.should == 1
+      rows.first.should == art
+    end
+    
+    it "should not return the row" do
+      art = Article.create! :title => 'a title', :user_id => 'bob', :time => Time.now + 1.minute
+      rows = Article.by_user_id_and_time :startkey => ['bob'], :endkey => ['bob',Time.now]
+      rows.length.should == 0
+    end
+  end
 
 end
