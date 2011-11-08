@@ -634,7 +634,7 @@ describe "Design View" do
           it "set limit and skip to nill and perform count" do
             @obj.should_receive(:limit).with(nil).and_return(@obj)
             @obj.should_receive(:skip).with(nil).and_return(@obj)
-            @obj.should_receive(:count).and_return(5)
+            @obj.should_receive(:length).and_return(5)
             @obj.total_count.should eql(5)
             @obj.total_count.should eql(5) # Second to test caching
           end
@@ -841,6 +841,11 @@ describe "Design View" do
         it "should return results from first page" do
           @view.all.first.name.should eql('Judith')
           @view.all.last.name.should eql('Lorena')
+        end
+        context "with per overridden" do
+          it "should calculate number of pages" do
+            @view.per(1).num_pages.should eql(2)
+          end
         end
       end
       

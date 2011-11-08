@@ -347,7 +347,7 @@ module CouchRest
         end
 
         def total_count
-          @total_count ||= limit(nil).skip(nil).count
+          @total_count ||= limit(nil).skip(nil).length
         end
 
         def offset_value
