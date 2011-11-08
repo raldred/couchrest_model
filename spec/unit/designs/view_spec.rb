@@ -8,6 +8,7 @@ class DesignViewModel < CouchRest::Model::Base
   design do
     view :by_name
     view :by_just_name, :map => "function(doc) { emit(doc['name'], null); }"
+    view :by_both_title_and_name, :map => "function(doc) { emit([doc['title'],doc['name']], null); }"
   end
 end
 
@@ -742,11 +743,11 @@ describe "Design View" do
 
     before :all do
       @objs = [
-        {:name => "Judith"},
-        {:name => "Lorena"},
-        {:name => "Peter"},
-        {:name => "Sam"},
-        {:name => "Vilma"}
+        {:name => "Judith", :title => 'Mrs'},
+        {:name => "Lorena", :title => 'Mrs'},
+        {:name => "Peter", :title => 'Mr'},
+        {:name => "Sam", :title => 'Mr'},
+        {:name => "Vilma", :title => 'Mrs'}
       ].map{|h| DesignViewModel.create(h)}
     end
 
@@ -809,6 +810,7 @@ describe "Design View" do
       it "should calculate number of pages" do
         @view.num_pages.should eql(2)
       end
+      
       it "should return results from first page" do
         @view.all.first.name.should eql('Judith')
         @view.all.last.name.should eql('Peter')
@@ -823,6 +825,25 @@ describe "Design View" do
         @view.num_pages.should eql(1)
         @view.all.last.name.should eql('Vilma')
       end
+      
+      context "with startkey and endkey" do
+        before(:each) do
+          @view = DesignViewModel.by_both_title_and_name.startkey(['Mrs','A']).endkey(['Mrs','M']).page(1)
+        end
+        describe "#total_count" do
+          it "should calculate based on filtered results" do
+            @view.total_count.should eql(2)
+          end
+        end
+        it "should calculate number of pages" do
+          @view.num_pages.should eql(1)
+        end
+        it "should return results from first page" do
+          @view.all.first.name.should eql('Judith')
+          @view.all.last.name.should eql('Lorena')
+        end
+      end
+      
     end
 
   end

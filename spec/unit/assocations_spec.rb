@@ -82,7 +82,6 @@ describe "Assocations" do
       @invoice = SaleInvoice.get(@invoice.id)
       @invoice.alternate_client.id.should eql(@client.id)
     end
-
   end
 
   describe "of type collection_of" do
